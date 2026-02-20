@@ -14,6 +14,11 @@
       <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
         Sign up to permanently save your sparks 🔥
       </div>
+    
+      <!-- Saving Indicator -->
+      <p v-if="isSaving" class="text-xs text-gray-400 mb-3">
+        Saving...
+      </p>
 
       <!-- Add Note -->
       <input
@@ -63,38 +68,96 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from "vue";
 import {
-    getNotes,
-    addNote,
-    deleteNote
-} from '@/utils/localStorageNotes';
+  getNotes,
+  deleteNote,
+  saveNotes
+} from "@/utils/localStorageNotes";
 
 const notes = ref([]);
-const title = ref('');
-const content = ref('');
+const title = ref("");
+const content = ref("");
+const currentDraftId = ref(null);
+const isSaving = ref(false);
 
+let typingTimeout = null;
+
+/* -------------------------
+   LOAD EXISTING NOTES
+-------------------------- */
 onMounted(() => {
-    notes.value = getNotes();
+  const stored = getNotes();
+
+  notes.value = Array.isArray(stored)
+    ? stored.filter(note => note && note.id)
+    : [];
 });
 
-function handleAdd(){
-    if(!title.value || !content.value) return;
+/* -------------------------
+   AUTO SAVE (Debounced)
+-------------------------- */
+watch([title, content], () => {
+  if (!title.value && !content.value) return;
 
+  if (typingTimeout) clearTimeout(typingTimeout);
+
+  isSaving.value = true;
+
+  typingTimeout = setTimeout(() => {
+    autoSave();
+    isSaving.value = false;
+  }, 1000);
+});
+
+/* -------------------------
+   AUTO SAVE LOGIC
+-------------------------- */
+function autoSave() {
+  // Ensure notes is always an array
+  if (!Array.isArray(notes.value)) {
+    notes.value = [];
+  }
+
+  // UPDATE existing draft
+  if (currentDraftId.value !== null) {
+    notes.value = notes.value.map(note =>
+      note.id === currentDraftId.value
+        ? {
+            ...note,
+            title: title.value,
+            content: content.value
+          }
+        : note
+    );
+  } 
+  // CREATE new draft
+  else {
     const newNote = {
-        id: Date.now(),
-        title: title.value,
-        content: content.value,
-        createdAt: new Date().toISOString()
+      id: Date.now(),
+      title: title.value,
+      content: content.value,
+      createdAt: new Date().toISOString()
     };
 
-    addNote(newNote);
-    notes.value = getNotes(); // Refresh notes list    
+    currentDraftId.value = newNote.id;
+    notes.value.unshift(newNote);
+  }
+
+  saveNotes(notes.value);
 }
 
-function handleDelete(noteId){
-    deleteNote(noteId);
-    notes.value = getNotes(); // Refresh notes list
-}
+/* -------------------------
+   DELETE NOTE
+-------------------------- */
+function handleDelete(noteId) {
+  deleteNote(noteId);
+  notes.value = getNotes() || [];
 
+  if (currentDraftId.value === noteId) {
+    currentDraftId.value = null;
+    title.value = "";
+    content.value = "";
+  }
+}
 </script>

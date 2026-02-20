@@ -1,9 +1,14 @@
 const NOTE_SPARK_KEY = "note_spark_notes";
 
-export function getNotes(){
-    // Retrieve the notes from localStorage and parse them as JSON. If there are no notes, return an empty array.
-    const notes = localStorage.getItem(NOTE_SPARK_KEY);
-    return notes ? JSON.parse(notes) : [];
+export function getNotes() {
+  try {
+    const data = localStorage.getItem("notes");
+    const parsed = data ? JSON.parse(data) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.error("Storage corrupted, resetting...");
+    return [];
+  }
 }
 
 export function saveNotes(notes){
