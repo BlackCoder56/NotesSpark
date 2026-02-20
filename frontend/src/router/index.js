@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import NoteSparkView from '@/views/NoteSparkView.vue'
+import HomeView from '@/views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'NoteSpark',
-      component: NoteSparkView
+      name: 'HomeView',
+      component: HomeView
     }
   ],
 })
