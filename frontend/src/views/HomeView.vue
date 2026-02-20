@@ -65,6 +65,14 @@
       </div>
 
     </div>
+    <transition name="toast">
+        <div
+            v-if="notification.show"
+            class="fixed top-6 left-1/2 -translate-x-1/2 bg-sky-600 text-white px-5 py-3 rounded-xl shadow-xl text-sm z-50"
+        >
+            {{ notification.message }}
+        </div>
+    </transition>
   </div>
 </template>
 <script setup>
@@ -79,7 +87,11 @@ const notes = ref([]);
 const title = ref("");
 const content = ref("");
 const currentDraftId = ref(null);
-const isSaving = ref(false);
+const notification = ref({
+  show: false,
+  message: "",
+  type: "info"
+});
 
 let typingTimeout = null;
 
@@ -102,11 +114,9 @@ watch([title, content], () => {
 
   if (typingTimeout) clearTimeout(typingTimeout);
 
-  isSaving.value = true;
-
   typingTimeout = setTimeout(() => {
     autoSave();
-    isSaving.value = false;
+    showNotification("Your Note Spark was auto-saved successfully ✨", "success");
   }, 1000);
 });
 
@@ -147,6 +157,18 @@ function autoSave() {
   saveNotes(notes.value);
 }
 
+function showNotification(message, type = "info") {
+  notification.value = {
+    show: true,
+    message,
+    type
+  };
+
+  setTimeout(() => {
+    notification.value.show = false;
+  }, 2000);
+}
+
 /* -------------------------
    DELETE NOTE
 -------------------------- */
@@ -161,3 +183,19 @@ function handleDelete(noteId) {
   }
 }
 </script>
+<style scoped>
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+
+.toast-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+</style>
