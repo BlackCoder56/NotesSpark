@@ -48,11 +48,13 @@
           class="border p-4 rounded-xl shadow-sm hover:shadow transition"
         >
           <h3 class="font-semibold text-sky-800">
-            {{ note.title }}
+            {{ 
+                note.title
+            }}
           </h3>
 
           <p class="text-sm text-gray-600 mt-1">
-            {{ note.content }}
+            {{ getPreview(note.content) }}
           </p>
 
           <button
@@ -182,6 +184,14 @@ function handleDelete(noteId) {
     content.value = "";
   }
 }
+
+function getPreview(content){
+    if(!content) return "";
+
+    return content.length > 20
+    ? content.slice(0, 20) + "..."
+    : content;
+}
 </script>
 <style scoped>
 .toast-enter-active,
@@ -189,13 +199,13 @@ function handleDelete(noteId) {
   transition: all 0.3s ease;
 }
 
-.toast-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
+.toast-enter-from{
+    opacity: 0;
+    transform: translate(-50%, -20px);
 }
 
-.toast-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
+.toast-leave-active{
+    opacity:0;
+    transform: translate(50%, -20px);
 }
 </style>
