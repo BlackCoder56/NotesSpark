@@ -65,22 +65,22 @@
 
         </div>
 
-        <!-- Content Field -->
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-600 mb-2">
-            Content
-          </label>
+       <!-- Content Field -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-600 mb-2">
+          Content
+        </label>
 
-          <textarea
-            v-model="content"
-            placeholder="Start writing your spark..."
-            class="w-full px-5 py-4 rounded-2xl bg-gray-100/70
-                  focus:bg-white focus:ring-2 focus:ring-sky-400
-                  focus:outline-none transition-all duration-200
-                  min-h-[280px] resize-none
-                  placeholder-gray-400"
-          ></textarea>
-        </div>
+        <textarea
+          v-model="content"
+          placeholder="Start writing your spark..."
+          class="w-full px-5 py-4 rounded-2xl bg-gray-100/70
+                focus:bg-white focus:ring-2 focus:ring-sky-400
+                focus:outline-none transition-all duration-200
+                min-h-[280px] resize-none
+                placeholder-gray-400"
+        ></textarea>
+      </div>
 
         <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
           Signup
@@ -91,30 +91,6 @@
         <div class="hidden lg:block lg:col-span-3 bg-white/40 rounded-2xl min-h-[80vh] border border-dashed border-sky-200">
 
         </div>
-
-        <div
-          v-for="note in notes"
-          :key="note.id"
-          class="border p-4 rounded-xl shadow-sm hover:shadow transition"
-        >
-          <h3 class="font-semibold text-sky-800">
-            {{ 
-                note.title
-            }}
-          </h3>
-
-          <p class="text-sm text-gray-600 mt-1">
-            {{ getPreview(note.content) }}
-          </p>
-
-          <button
-            @click="handleDelete(note.id)"
-            class="text-red-500 text-xs mt-3 hover:underline"
-          >
-            Delete
-          </button>
-        </div>
-      </div> -->
 
     </div>
     <transition name="toast">
