@@ -1,47 +1,97 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-sky-50 to-indigo-100 p-6">
-    <div class="max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-lg">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-      <h2 class="text-2xl font-bold mb-2 text-sky-700">
-        ✨ NoteSpark
-      </h2>
+       <!-- Notes List (LEFT) -->
+      <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-lg min-h-[80vh]">
+        <h3 class="font-semibold text-sky-800">Your Sparks</h3>
 
-      <p class="text-sm text-gray-500 mb-4">
-        Quick notes. No account needed.
-      </p>
+        <div v-if="notes.length === 0" class="text-gray-400 text-sm text-center py-10">
+          No sparks yet! Start typing to create your one.
+        </div>
+        
+        <div v-else class="space-y-4">
+          <div
+          v-for="note in notes"
+          :key="note.id"
+          class="border p-4 rounded-xl shadow-sm hover:shadow transition"
+          >
+          <h3 class="font-semibold text-sky-800">
+            {{ note.title || "Untitled" }}
+          </h3>
 
-      <!-- CTA Banner -->
-      <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
-        Sign up to permanently save your sparks 🔥
+          <p class="text-sm text-gray-600 mt-1">
+            {{ getPreview(note.content) }}
+          </p>
+
+          <button
+          @click="handleDelete(note.id)"
+          class="text-red-500 text-xs mt-3 hover:underline">
+            Delete
+          </button>
+          </div>
+        </div>
       </div>
-    
-      <!-- Saving Indicator -->
-      <p v-if="isSaving" class="text-xs text-gray-400 mb-3">
-        Saving...
-      </p>
 
-      <!-- Add Note -->
-      <input
-        v-model="title"
-        class="w-full mb-2 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400"
-        placeholder="Title"
-      />
+      <!-- Editor (Middle/right) -->
+       <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg min-h-[80vh]">
+        <h2 class="text-2xl font-bold mb-2 text-sky-700">
+          Note Spark
+        </h2>
 
-      <textarea
-        v-model="content"
-        class="w-full mb-3 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400"
-        placeholder="Write your spark..."
-      />
+        <p class="text-sm text-gray 500 mb-4">
+          Quick notes. No account needed.
+        </p>
 
-      <button
-        @click="handleAdd"
-        class="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 transition"
-      >
-        Add Spark
-      </button>
+        <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
+          Signup up to permanently save your sparks 🔥
+        </div>
 
-      <!-- Notes -->
-      <div class="mt-6 space-y-4">
+        <div class="mb-6">
+
+          <label for="title" class="block text-sm font-medium text-gray-600 mb-2">
+            Title
+          </label>
+
+          <input 
+            id="title"
+            v-model="title"
+            placeholder="Enter a title..."
+            type="text" 
+            class="w-full px-4 py-3 rounded-2xl bg-gray-100/70 
+                  focus:bg-white focus:ring-2 focus:ring-sky-400 focus:outline-none 
+                  transition-all duration-200 placeholder-gray-400"
+          />
+
+        </div>
+
+       <!-- Content Field -->
+<div class="mb-6">
+  <label class="block text-sm font-medium text-gray-600 mb-2">
+    Content
+  </label>
+
+  <textarea
+    v-model="content"
+    placeholder="Start writing your spark..."
+    class="w-full px-5 py-4 rounded-2xl bg-gray-100/70
+           focus:bg-white focus:ring-2 focus:ring-sky-400
+           focus:outline-none transition-all duration-200
+           min-h-[280px] resize-none
+           placeholder-gray-400"
+  ></textarea>
+</div>
+
+        <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
+          Signup
+        </div>
+       </div>
+
+       <!-- Adds panel -->
+        <div class="hidden lg:block lg:col-span-3 bg-white/40 rounded-2xl min-h-[80vh] border border-dashed border-sky-200">
+
+        </div>
+      <!-- <div class="mt-6 space-y-4">
         <div
           v-for="note in notes"
           :key="note.id"
@@ -64,7 +114,7 @@
             Delete
           </button>
         </div>
-      </div>
+      </div> -->
 
     </div>
     <transition name="toast">
@@ -77,6 +127,7 @@
     </transition>
   </div>
 </template>
+
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import {
@@ -192,6 +243,7 @@ function getPreview(content){
     ? content.slice(0, 20) + "..."
     : content;
 }
+
 </script>
 <style scoped>
 .toast-enter-active,
