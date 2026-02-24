@@ -65,22 +65,22 @@
 
         </div>
 
-       <!-- Content Field -->
-<div class="mb-6">
-  <label class="block text-sm font-medium text-gray-600 mb-2">
-    Content
-  </label>
+        <!-- Content Field -->
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-600 mb-2">
+            Content
+          </label>
 
-  <textarea
-    v-model="content"
-    placeholder="Start writing your spark..."
-    class="w-full px-5 py-4 rounded-2xl bg-gray-100/70
-           focus:bg-white focus:ring-2 focus:ring-sky-400
-           focus:outline-none transition-all duration-200
-           min-h-[280px] resize-none
-           placeholder-gray-400"
-  ></textarea>
-</div>
+          <textarea
+            v-model="content"
+            placeholder="Start writing your spark..."
+            class="w-full px-5 py-4 rounded-2xl bg-gray-100/70
+                  focus:bg-white focus:ring-2 focus:ring-sky-400
+                  focus:outline-none transition-all duration-200
+                  min-h-[280px] resize-none
+                  placeholder-gray-400"
+          ></textarea>
+        </div>
 
         <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
           Signup
@@ -91,7 +91,7 @@
         <div class="hidden lg:block lg:col-span-3 bg-white/40 rounded-2xl min-h-[80vh] border border-dashed border-sky-200">
 
         </div>
-      <!-- <div class="mt-6 space-y-4">
+
         <div
           v-for="note in notes"
           :key="note.id"
@@ -129,135 +129,136 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import {
-  getNotes,
-  deleteNote,
-  saveNotes
-} from "@/utils/localStorageNotes";
+  import { ref, onMounted, watch } from "vue";
+  import {
+    getNotes,
+    deleteNote,
+    saveNotes
+  } from "@/utils/localStorageNotes";
 
-const notes = ref([]);
-const title = ref("");
-const content = ref("");
-const currentDraftId = ref(null);
-const notification = ref({
-  show: false,
-  message: "",
-  type: "info"
-});
+  const notes = ref([]);
+  const title = ref("");
+  const content = ref("");
+  const currentDraftId = ref(null);
+  const notification = ref({
+    show: false,
+    message: "",
+    type: "info"
+  });
 
-let typingTimeout = null;
+  let typingTimeout = null;
 
-/* -------------------------
-   LOAD EXISTING NOTES
--------------------------- */
-onMounted(() => {
-  const stored = getNotes();
+  /* -------------------------
+    LOAD EXISTING NOTES
+  -------------------------- */
+  onMounted(() => {
+    const stored = getNotes();
 
-  notes.value = Array.isArray(stored)
-    ? stored.filter(note => note && note.id)
-    : [];
-});
+    notes.value = Array.isArray(stored)
+      ? stored.filter(note => note && note.id)
+      : [];
+  });
 
-/* -------------------------
-   AUTO SAVE (Debounced)
--------------------------- */
-watch([title, content], () => {
-  if (!title.value && !content.value) return;
+  /* -------------------------
+    AUTO SAVE (Debounced)
+  -------------------------- */
+  watch([title, content], () => {
+    if (!title.value && !content.value) return;
 
-  if (typingTimeout) clearTimeout(typingTimeout);
+    if (typingTimeout) clearTimeout(typingTimeout);
 
-  typingTimeout = setTimeout(() => {
-    autoSave();
-    showNotification("Your Note Spark was auto-saved successfully ✨", "success");
-  }, 1000);
-});
+    typingTimeout = setTimeout(() => {
+      autoSave();
+      showNotification("Your Note Spark was auto-saved successfully ✨", "success");
+    }, 1000);
+  });
 
-/* -------------------------
-   AUTO SAVE LOGIC
--------------------------- */
-function autoSave() {
-  // Ensure notes is always an array
-  if (!Array.isArray(notes.value)) {
-    notes.value = [];
+  /* -------------------------
+    AUTO SAVE LOGIC
+  -------------------------- */
+  function autoSave() {
+    // Ensure notes is always an array
+    if (!Array.isArray(notes.value)) {
+      notes.value = [];
+    }
+
+    // UPDATE existing draft
+    if (currentDraftId.value !== null) {
+      notes.value = notes.value.map(note =>
+        note.id === currentDraftId.value
+          ? {
+              ...note,
+              title: title.value,
+              content: content.value
+            }
+          : note
+      );
+    } 
+    // CREATE new draft
+    else {
+      const newNote = {
+        id: Date.now(),
+        title: title.value,
+        content: content.value,
+        createdAt: new Date().toISOString()
+      };
+
+      currentDraftId.value = newNote.id;
+      notes.value.unshift(newNote);
+    }
+
+    saveNotes(notes.value);
   }
 
-  // UPDATE existing draft
-  if (currentDraftId.value !== null) {
-    notes.value = notes.value.map(note =>
-      note.id === currentDraftId.value
-        ? {
-            ...note,
-            title: title.value,
-            content: content.value
-          }
-        : note
-    );
-  } 
-  // CREATE new draft
-  else {
-    const newNote = {
-      id: Date.now(),
-      title: title.value,
-      content: content.value,
-      createdAt: new Date().toISOString()
+  function showNotification(message, type = "info") {
+    notification.value = {
+      show: true,
+      message,
+      type
     };
 
-    currentDraftId.value = newNote.id;
-    notes.value.unshift(newNote);
+    setTimeout(() => {
+      notification.value.show = false;
+    }, 2000);
   }
 
-  saveNotes(notes.value);
-}
+  /* -------------------------
+    DELETE NOTE
+  -------------------------- */
+  function handleDelete(noteId) {
+    deleteNote(noteId);
+    notes.value = getNotes() || [];
 
-function showNotification(message, type = "info") {
-  notification.value = {
-    show: true,
-    message,
-    type
-  };
-
-  setTimeout(() => {
-    notification.value.show = false;
-  }, 2000);
-}
-
-/* -------------------------
-   DELETE NOTE
--------------------------- */
-function handleDelete(noteId) {
-  deleteNote(noteId);
-  notes.value = getNotes() || [];
-
-  if (currentDraftId.value === noteId) {
-    currentDraftId.value = null;
-    title.value = "";
-    content.value = "";
+    if (currentDraftId.value === noteId) {
+      currentDraftId.value = null;
+      title.value = "";
+      content.value = "";
+    }
   }
-}
 
-function getPreview(content){
-    if(!content) return "";
+  function getPreview(content){
+      if(!content) return "";
 
-    return content.length > 20
-    ? content.slice(0, 20) + "..."
-    : content;
-}
+      return content.length > 20
+      ? content.slice(0, 20) + "..."
+      : content;
+  }
 
 </script>
+
 <style scoped>
-.toast-enter-active,
-.toast-leave-active {
-  transition: all 0.3s ease;
-}
+  .toast-enter-active,
+  .toast-leave-active {
+    transition: all 0.3s ease;
+  }
 
-.toast-enter-from{
-    opacity: 0;
-    transform: translate(-50%, -20px);
-}
+  .toast-enter-from{
+      opacity: 0;
+      transform: translate(-50%, -20px);
+  }
 
-.toast-leave-active{
-    opacity:0;
-    transform: translate(50%, -20px);
-}
+  .toast-leave-active{
+      opacity:0;
+      transform: translate(50%, -20px);
+  }
 </style>
