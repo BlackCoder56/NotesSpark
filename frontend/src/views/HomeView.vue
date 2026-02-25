@@ -94,14 +94,10 @@
         </label>
 
         <textarea
-          v-model="content"
-          placeholder="Start writing your spark..."
-          class="w-full px-5 py-4 rounded-2xl bg-gray-100/70
-                focus:bg-white focus:ring-2 focus:ring-sky-400
-                focus:outline-none transition-all duration-200
-                min-h-[280px] resize-none
-                placeholder-gray-400"
-        ></textarea>
+  v-model="content"
+  placeholder="Start writing your spark..."
+  class="book-textarea"
+></textarea>
       </div>
 
         <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
@@ -294,4 +290,49 @@
       opacity:0;
       transform: translate(50%, -20px);
   }
+
+  .book-textarea {
+  width: 100%;
+  min-height: 320px;
+  resize: none;
+
+  padding: 2rem 2rem;
+  border-radius: 24px;
+  border: none;
+  outline: none;
+
+  font-size: 1rem;
+  line-height: 1.8rem;
+  font-family: 'Georgia', 'Times New Roman', serif;
+
+  background-color: #fdfcf7;
+
+  /* notebook lines */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 1.7rem,
+    rgba(0, 0, 0, 0.05) 1.75rem
+  );
+
+  box-shadow: 
+    inset 0 1px 3px rgba(0,0,0,0.05),
+    0 4px 20px rgba(0,0,0,0.05);
+
+  transition: all 0.2s ease;
+}
+
+.book-textarea:focus {
+  background-color: #ffffff;
+  box-shadow: 
+    inset 0 1px 3px rgba(0,0,0,0.05),
+    0 0 0 2px #38bdf8,
+    0 6px 25px rgba(0,0,0,0.08);
+}
+
+.book-textarea::placeholder {
+  color: #a8a29e;
+  font-style: italic;
+}
+
 </style>
