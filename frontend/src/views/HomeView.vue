@@ -35,10 +35,20 @@
 
       <!-- Editor (Middle/right) -->
        <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg min-h-[80vh]">
-        <h2 class="text-2xl font-bold mb-2 text-sky-700">
-          Note Spark
-        </h2>
+        <div class="flex items-center justify-between mb-2">
+           <h2 class="text-2xl font-bold mb-2 text-sky-700">
+            Note Spark
+          </h2>
 
+          <button 
+            @click="createNewNote"
+            class="px-4 py-2 text-sm font-medium 
+                  rounded-xl bg-sky-600 text-white 
+                  hover:bg-sky-700 active:scale-95 
+                  transition-all duration-150 shadow-sm"
+                  >+ New Note</button>
+        </div>
+       
         <p class="text-sm text-gray 500 mb-4">
           Quick notes. No account needed.
         </p>
@@ -206,9 +216,7 @@
     notes.value = getNotes() || [];
 
     if (currentDraftId.value === noteId) {
-      currentDraftId.value = null;
-      title.value = "";
-      content.value = "";
+      resetEditor();
     }
   }
 
@@ -218,6 +226,16 @@
       return content.length > 20
       ? content.slice(0, 20) + "..."
       : content;
+  }
+
+  function resetEditor() {
+    currentDraftId.value = null;
+    title.value = "";
+    content.value = "";
+  }
+
+  function createNewNote(){
+    resetEditor();
   }
 
 </script>
