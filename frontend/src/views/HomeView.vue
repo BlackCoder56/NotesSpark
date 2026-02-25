@@ -1,5 +1,5 @@
 <template>
-  <div class=" overflow-hidden bg-gradient-to-br from-sky-50 to-indigo-100 p-6">
+  <div class="h-screen overflow-hidden bg-gradient-to-br from-sky-50 to-indigo-100 p-6">
     <div class="max-w-7xl mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-8">
 
       <!-- Notes List (LEFT) -->
