@@ -1,37 +1,49 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-sky-50 to-indigo-100 p-6">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <div class=" overflow-hidden bg-gradient-to-br from-sky-50 to-indigo-100 p-6">
+    <div class="max-w-7xl mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-       <!-- Notes List (LEFT) -->
-      <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-lg min-h-[80vh]">
-        <h3 class="font-semibold text-sky-800">Your Sparks</h3>
+      <!-- Notes List (LEFT) -->
+    <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
+  
+  <h3 class="font-semibold text-sky-800 mb-4 shrink-0">
+    Your Sparks
+  </h3>
 
-        <div v-if="notes.length === 0" class="text-gray-400 text-sm text-center py-10">
-          No sparks yet! Start typing to create your one.
-        </div>
-        
-        <div v-else class="space-y-4">
-          <div
-          v-for="note in notes"
-          :key="note.id"
-          class="border p-4 rounded-xl shadow-sm hover:shadow transition"
-          >
-          <h3 class="font-semibold text-sky-800">
-            {{ note.title || "Untitled" }}
-          </h3>
+  <div v-if="notes.length === 0"
+       class="text-gray-400 text-sm text-center py-10 flex-1">
+    No sparks yet! Start typing to create your one.
+  </div>
 
-          <p class="text-sm text-gray-600 mt-1">
-            {{ getPreview(note.content) }}
-          </p>
+  <div v-else
+       class="flex-1 overflow-y-auto space-y-4 pr-2">
 
-          <button
-          @click="handleDelete(note.id)"
-          class="text-red-500 text-xs mt-3 hover:underline">
-            Delete
-          </button>
-          </div>
-        </div>
-      </div>
+    <div
+      v-for="note in notes"
+      :key="note.id"
+      @click="editNote(note)"
+      :class="[
+        'cursor-pointer border p-4 rounded-xl shadow-sm hover:shadow transition',
+        note.id === currentDraftId ? 'bg-sky-100 border-sky-300' : ''
+      ]"
+    >
+      <h3 class="font-semibold text-sky-800">
+        {{ note.title || "Untitled" }}
+      </h3>
+
+      <p class="text-sm text-gray-600 mt-1">
+        {{ getPreview(note.content) }}
+      </p>
+
+      <button
+        @click.stop="handleDelete(note.id)"
+        class="text-red-500 text-xs mt-3 hover:underline"
+      >
+        Delete
+      </button>
+    </div>
+
+  </div>
+</div>
 
       <!-- Editor (Middle/right) -->
        <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg min-h-[80vh]">
@@ -115,7 +127,7 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, watch } from "vue";
+  import { ref, onMounted, watch, nextTick } from "vue";
   import {
     getNotes,
     deleteNote,
@@ -238,9 +250,36 @@
     resetEditor();
   }
 
+  // When a note is clicked, load it into the editor
+  function editNote(note) {
+    currentDraftId.value = note.id;
+    title.value = note.title;
+    content.value = note.content;
+
+    // Scroll to the selected note in the list
+    nextTick(() => {
+        const el = document.getElementById(`note-${note.id}`);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center'});
+      });
+  }
+
 </script>
 
 <style scoped>
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(100, 116, 139, 0.3);
+  border-radius: 3px;
+}
+
   .toast-enter-active,
   .toast-leave-active {
     transition: all 0.3s ease;
