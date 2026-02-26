@@ -312,7 +312,7 @@
     to bottom,
     transparent,
     transparent 1.7rem,
-    rgba(0, 0, 0, 0.05) 1.75rem
+    rgba(0, 0, 0, 0.74) 1.75rem
   );
 
   box-shadow: 
