@@ -3,54 +3,52 @@
     <div class="max-w-7xl mx-auto h-full grid grid-cols-1 lg:grid-cols-12 gap-8">
 
       <!-- Notes List (LEFT) -->
-    <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
+      <div class="lg:col-span-3 bg-white p-6 rounded-2xl shadow-lg h-full flex flex-col overflow-hidden">
   
-  <h3 class="font-semibold text-sky-800 mb-4 shrink-0">
-    Your Sparks
-  </h3>
+        <h3 class="font-semibold text-sky-800 mb-4 shrink-0">
+          Your Sparks
+        </h3>
 
-  <div v-if="notes.length === 0"
-       class="text-gray-400 text-sm text-center py-10 flex-1">
-    No sparks yet! Start typing to create your one.
-  </div>
+        <div v-if="notes.length === 0"
+            class="text-gray-400 text-sm text-center py-10 flex-1">
+          No sparks yet! Start typing to create your one.
+        </div>
 
-  <div v-else
-       class="flex-1 overflow-y-auto space-y-4 pr-2">
+        <div v-else            class="flex-1 overflow-y-auto space-y-4 pr-2">
+        <div
+          v-for="note in notes"
+          :key="note.id"
+          @click="editNote(note)"
+          :class="[
+            'cursor-pointer border p-4 rounded-xl shadow-sm hover:shadow transition',
+            note.id === currentDraftId ? 'bg-sky-100 border-sky-300' : ''
+          ]"
+        >
+          <h3 class="font-semibold text-sky-800">
+            {{ note.title || "Untitled" }}
+          </h3>
 
-    <div
-      v-for="note in notes"
-      :key="note.id"
-      @click="editNote(note)"
-      :class="[
-        'cursor-pointer border p-4 rounded-xl shadow-sm hover:shadow transition',
-        note.id === currentDraftId ? 'bg-sky-100 border-sky-300' : ''
-      ]"
-    >
-      <h3 class="font-semibold text-sky-800">
-        {{ note.title || "Untitled" }}
-      </h3>
+          <p class="text-sm text-gray-600 mt-1">
+            {{ getPreview(note.content) }}
+          </p>
 
-      <p class="text-sm text-gray-600 mt-1">
-        {{ getPreview(note.content) }}
-      </p>
+          <button
+            @click.stop="handleDelete(note.id)"
+            class="text-red-500 text-xs mt-3 hover:underline"
+          >
+            Delete
+          </button>
+        </div>
 
-      <button
-        @click.stop="handleDelete(note.id)"
-        class="text-red-500 text-xs mt-3 hover:underline"
-      >
-        Delete
-      </button>
+      </div>
     </div>
 
-  </div>
-</div>
-
-      <!-- Editor (Middle/right) -->
-       <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg min-h-[80vh]">
-        <div class="flex items-center justify-between mb-2">
-           <h2 class="text-2xl font-bold mb-2 text-sky-700">
-            Note Spark
-          </h2>
+    <!-- Editor (Middle/right) -->
+    <div class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg min-h-[80vh]">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-2xl font-bold mb-2 text-sky-700">
+        Note Spark
+        </h2>
 
           <button 
             @click="createNewNote"
@@ -65,9 +63,17 @@
           Quick notes. No account needed.
         </p>
 
-        <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
-          Signup up to permanently save your sparks 🔥
-        </div>
+       <div
+  @click="goToSignup"
+  class="mb-4 p-3 rounded-xl text-sm font-medium
+         bg-indigo-100 text-indigo-800
+         cursor-pointer
+         transition-all duration-200
+         hover:bg-indigo-200 hover:shadow-md
+         active:scale-[0.98]"
+>
+  Click Here to Signup and  permanently save your sparks 🔥
+</div>
 
         <div class="mb-6">
 
@@ -100,9 +106,6 @@
 ></textarea>
       </div>
 
-        <div class="mb-4 p-3 bg-indigo-100 text-indigo-800 rounded-lg text-sm">
-          Signup
-        </div>
        </div>
 
        <!-- Adds panel -->
@@ -119,6 +122,7 @@
             {{ notification.message }}
         </div>
     </transition>
+
   </div>
 </template>
 
@@ -129,6 +133,7 @@
     deleteNote,
     saveNotes
   } from "@/utils/localStorageNotes";
+
 
   const notes = ref([]);
   const title = ref("");
